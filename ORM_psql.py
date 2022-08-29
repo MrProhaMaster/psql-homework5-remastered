@@ -36,7 +36,7 @@ class Stock(Base):
     book = relationship(Book, backref="stock")
     shop = relationship(Shop, backref="stock")
 
-class Stale(Base):
+class Sale(Base):
     __tablename__ = "sale"
 
     id = sq.Column(sq.Integer, primary_key=True)
