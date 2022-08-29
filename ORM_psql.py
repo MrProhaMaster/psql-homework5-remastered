@@ -10,6 +10,9 @@ class Publisher(Base):
     id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(length=40), unique=True, nullable=False)
 
+    def __str__(self):
+        return f'{self.id}, {self.name}'
+
 class Shop(Base):
     __tablename__ = "shop"
 
@@ -21,7 +24,7 @@ class Book(Base):
 
     id = sq.Column(sq.Integer, primary_key=True)
     title = sq.Column(sq.String(length=80), unique=True)
-    publisher_id = sq.Column(sq.Integer, sq.ForeignKey("publisher.id"))
+    publisher_id = sq.Column(sq.Integer, sq.ForeignKey("publisher.id"), nullable=False)
 
     publisher = relationship(Publisher, backref="book")
 
@@ -45,17 +48,20 @@ class Sale(Base):
     stock_id = sq.Column(sq.Integer, sq.ForeignKey("stock.id"))
     count = sq.Column(sq.Integer)
 
-    stock = relationship(Stock, sq.ForeignKey("sale.id"))
+    stock = relationship(Stock, backref="sale")
 
 def create_tables(engine):
-    Base.metadata.drop_all(engine)
+    #Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-DSN = "postgresql://postgres:133766@localhost:5432/shop_base"
+DSN = "postgresql://postgres:133766@localhost:5432/shopbase"
 engine = sqlalchemy.create_engine(DSN)
 create_tables(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
-
 session.commit()
+
+in_ = int(input('Введите идентификатор нужного писателя: '))
+for r in session.query(Publisher).filter(Publisher.id == in_):
+    print(r)
