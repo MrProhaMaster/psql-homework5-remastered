@@ -19,6 +19,9 @@ class Shop(Base):
     id = sq.Column(sq.Integer, primary_key=True)
     name = sq.Column(sq.String(length=40), unique=True, nullable=False)
 
+    def __str__(self):
+        return f'{self.id}: {self.name}'
+
 class Book(Base):
     __tablename__ = "book"
 
@@ -63,5 +66,6 @@ session = Session()
 session.commit()
 
 in_ = int(input('Введите идентификатор нужного писателя: '))
-for r in session.query(Publisher).filter(Publisher.id == in_):
+subq = session.query(Stock).join(Book, Stock.book_id == Book.id).join(Publisher, Book.publisher_id == Publisher.id).filter(Publisher.id == in_).subquery()
+for r in session.query(Shop).join(subq, Shop.id == subq.c.shop_id).all():
     print(r)
